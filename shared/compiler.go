@@ -75,6 +75,12 @@ func Compile(args []string, compiler string) (exitCode int) {
 			exitCode = 1
 		}
 
+		// Save bitcode when available
+		if pr.IsLTO || pr.IsEmitLLVM {
+			absBcPath, _ := filepath.Abs(pr.OutputFilename)
+			_ = copyBitcodeToStore(absBcPath)
+		}
+
 		// Else try to build bitcode as well
 	} else {
 		var bcObjLinks []bitcodeToObjectLink
@@ -226,14 +232,27 @@ func injectPath(extension, bcFile, objFile string) (success bool) {
 
 	// Run the attach command and ignore errors
 	_, nerr := execCmd(attachCmd, attachCmdArgs, "")
+
+	// Copy bitcode file to store, if necessary
+	err = copyBitcodeToStore(absBcPath)
+	if err != nil {
+		return
+	}
+
+	// Check error after bitcode is copied
 	if nerr != nil {
 		LogWarning("attachBitcodePathToObject: %v %v failed because %v\n", attachCmd, attachCmdArgs, nerr)
 		return
 	}
 
-	// Copy bitcode file to store, if necessary
+	success = true
+	return
+}
+
+func copyBitcodeToStore(absBcPath string) (err error) {
 	if bcStorePath := LLVMBitcodeStorePath; bcStorePath != "" {
 		destFilePath := path.Join(bcStorePath, getHashedPath(absBcPath))
+		LogDebug("Saving bitcode from %v to store at %v\n", absBcPath, destFilePath)
 		in, _ := os.Open(absBcPath)
 		defer CheckDefer(func() error { return in.Close() })
 		out, _ := os.Create(destFilePath)
@@ -241,17 +260,15 @@ func injectPath(extension, bcFile, objFile string) (success bool) {
 		_, err := io.Copy(out, in)
 		if err != nil {
 			LogWarning("Copying bc to bitcode archive %v failed because %v\n", destFilePath, err)
-			return
+			return err
 		}
 		err = out.Sync()
 		if err != nil {
 			LogWarning("Syncing bitcode archive %v failed because %v\n", destFilePath, err)
-			return
+			return err
 		}
-
 	}
-	success = true
-	return
+	return nil
 }
 
 func compileTimeLinkFiles(compilerExecName string, pr ParserResult, objFiles []string) {
