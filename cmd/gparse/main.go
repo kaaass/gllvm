@@ -35,8 +35,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/SRI-CSL/gllvm/shared"
 	"os"
+
+	"github.com/kaaass/gllvm/shared"
 )
 
 func main() {

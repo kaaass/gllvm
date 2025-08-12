@@ -33,7 +33,7 @@
 
 package main
 
-import "github.com/SRI-CSL/gllvm/shared"
+import "github.com/kaaass/gllvm/shared"
 
 func main() {
 	shared.SanityCheck()
