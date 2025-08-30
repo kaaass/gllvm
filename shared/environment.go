@@ -95,8 +95,8 @@ var LLVMbcGen []string
 // LLVMLtoLDFLAGS is the list of extra flags to pass to the linking steps, when under -flto
 var LLVMLtoLDFLAGS []string
 
-// LLVMCustomBCCompiler is the user configured path to a custom bitcode compiler.
-var LLVMCustomBCCompiler string
+// LLVMCustomBCCompilerDir is the user configured directory path containing custom bitcode compilers.
+var LLVMCustomBCCompilerDir string
 
 const (
 	envpath    = "LLVM_COMPILER_PATH"
@@ -119,8 +119,8 @@ const (
 	//iam: 10/11/2020 extra linking arguments to add to the linking step when we are doing
 	// link time optimization.
 	envltolink = "LTO_LINKING_FLAGS"
-	// Custom bitcode compiler path
-	envcustombc = "GLLVM_CUSTOM_BC_COMPILER"
+	// Custom bitcode compiler directory path
+	envcustombc = "GLLVM_CUSTOM_BC_COMPILER_DIR"
 )
 
 func init() {
@@ -160,7 +160,7 @@ func ResetEnvironment() {
 	LLVMLd = ""
 	LLVMbcGen = []string{}
 	LLVMLtoLDFLAGS = []string{}
-	LLVMCustomBCCompiler = ""
+	LLVMCustomBCCompilerDir = ""
 }
 
 // FetchEnvironment is used in initializing our globals, it is also used in testing
@@ -184,5 +184,5 @@ func FetchEnvironment() {
 
 	LLVMbcGen = strings.Fields(os.Getenv(envbcgen))
 	LLVMLtoLDFLAGS = strings.Fields(os.Getenv(envltolink))
-	LLVMCustomBCCompiler = os.Getenv(envcustombc)
+	LLVMCustomBCCompilerDir = os.Getenv(envcustombc)
 }

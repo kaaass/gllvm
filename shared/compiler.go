@@ -315,8 +315,10 @@ func buildBitcodeFile(compilerExecName string, pr ParserResult, srcFile string, 
 
 	// Use custom bitcode compiler if specified
 	customCompilerExec := compilerExecName
-	if LLVMCustomBCCompiler != "" {
-		customCompilerExec = LLVMCustomBCCompiler
+	if LLVMCustomBCCompilerDir != "" {
+		// LLVMCustomBCCompilerDir is a directory path, get the compiler name from compilerExecName
+		compilerBaseName := filepath.Base(compilerExecName)
+		customCompilerExec = filepath.Join(LLVMCustomBCCompilerDir, compilerBaseName)
 	}
 
 	success, err := execCmd(customCompilerExec, args, "")
