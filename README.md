@@ -111,6 +111,10 @@ environment variables.
     environment variables `LLVM_LINK_NAME` and `LLVM_AR_NAME` in an
     analogous way.
 
+ * `GLLVM_CUSTOM_BC_COMPILER` can be set to specify a custom compiler executable 
+    to use specifically for bitcode generation, overriding the default compiler for 
+    the bitcode compilation step only.
+
 Another useful, and sometimes necessary, environment variable is `WLLVM_CONFIGURE_ONLY`.
 
 * `WLLVM_CONFIGURE_ONLY` can be set to anything. If it is set, `gclang`
@@ -255,6 +259,21 @@ In other situations it is desirable to pass certain flags to `llvm-link` in the 
 that merges multiple individual bitcode files together (i.e., within `get-bc`).
 This can be fulfilled by setting the `LLVM_LINK_FLAGS` environment variable to
 the desired flags, for example `"-internalize -only-needed"`.
+
+For even more fine-grained control, you can specify a completely different compiler 
+executable for the bitcode generation step by setting `GLLVM_CUSTOM_BC_COMPILER`.
+This is useful when you need to use a specific version of clang or a different
+LLVM-based compiler for bitcode generation while keeping your regular compilation
+with a different compiler. For example:
+
+```
+export GLLVM_CUSTOM_BC_COMPILER=/usr/local/bin/clang-15
+CC=gclang make
+```
+
+This will use your default compiler (as specified by other environment variables
+or found in PATH) for normal compilation, but `/usr/local/bin/clang-15` specifically
+for generating the bitcode files.
 
 ## Beware of link time optimization.
 

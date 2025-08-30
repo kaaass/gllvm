@@ -95,6 +95,9 @@ var LLVMbcGen []string
 // LLVMLtoLDFLAGS is the list of extra flags to pass to the linking steps, when under -flto
 var LLVMLtoLDFLAGS []string
 
+// LLVMCustomBCCompiler is the user configured path to a custom bitcode compiler.
+var LLVMCustomBCCompiler string
+
 const (
 	envpath    = "LLVM_COMPILER_PATH"
 	envcc      = "LLVM_CC_NAME"
@@ -116,6 +119,8 @@ const (
 	//iam: 10/11/2020 extra linking arguments to add to the linking step when we are doing
 	// link time optimization.
 	envltolink = "LTO_LINKING_FLAGS"
+	// Custom bitcode compiler path
+	envcustombc = "GLLVM_CUSTOM_BC_COMPILER"
 )
 
 func init() {
@@ -124,7 +129,7 @@ func init() {
 
 // PrintEnvironment is used for printing the aspects of the environment that concern us
 func PrintEnvironment() {
-	vars := []string{envpath, envcc, envcxx, envf, envar, envlnk, envcfg, envbc, envlvl, envfile, envobjcopy, envld, envbcgen, envltolink}
+	vars := []string{envpath, envcc, envcxx, envf, envar, envlnk, envcfg, envbc, envlvl, envfile, envobjcopy, envld, envbcgen, envltolink, envcustombc}
 
 	informUser("\nLiving in this environment:\n\n")
 	for _, v := range vars {
@@ -155,6 +160,7 @@ func ResetEnvironment() {
 	LLVMLd = ""
 	LLVMbcGen = []string{}
 	LLVMLtoLDFLAGS = []string{}
+	LLVMCustomBCCompiler = ""
 }
 
 // FetchEnvironment is used in initializing our globals, it is also used in testing
@@ -178,4 +184,5 @@ func FetchEnvironment() {
 
 	LLVMbcGen = strings.Fields(os.Getenv(envbcgen))
 	LLVMLtoLDFLAGS = strings.Fields(os.Getenv(envltolink))
+	LLVMCustomBCCompiler = os.Getenv(envcustombc)
 }
